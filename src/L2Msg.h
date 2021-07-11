@@ -36,20 +36,7 @@ typedef enum
 
 }L2_MESSAGE_ID;
 
-typedef struct
-	{	/* date and time components */
-	int tm_sec;
-	int tm_min;
-	int tm_hour;
-	int tm_mday;
-	int tm_mon;
-	int tm_year;
-	int tm_wday;
-	int tm_yday;
-	int tm_isdst;
-	}RTC_TMR_STRUCT;
-
-bool constructL2SendMessage(L2_MESSAGE_ID msgId, uint8_t *data, uint8_t dataSize);
+uint8_t constructL2SendMessage(L2_MESSAGE_ID msgId, uint8_t *data, uint8_t dataSize);
 
 uint8_t ConstructL2Msg_HeartbeatStatus(void);
 

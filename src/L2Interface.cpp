@@ -10,12 +10,16 @@ using namespace std;
 #define PIN_CE 	17 // (chip enable)
 #define PIN_CSN 0  // (chip select not)
 
+/******************************************************************************/
 
-extern uint8_t L2TXMsgBuffer[L2_TX_MSG_BUFFER_SIZE];
-extern uint8_t L2RXMsgBuffer[L2_RX_MSG_BUFFER_SIZE];
+uint8_t L2TXMsgBuffer[L2_TX_MSG_BUFFER_SIZE] = {0};
+uint8_t L2RXMsgBuffer[L2_RX_MSG_BUFFER_SIZE] = {0};
 
+uint64_t TXAddress = 0x7878787878LL;
 uint8_t pipeNumber;
 uint8_t payloadSize;
+
+/******************************************************************************/
 
 L2Interface::L2Interface(RF24 *radioObj)
 {
@@ -113,7 +117,54 @@ uint8_t L2Interface::L2_flushRXBuffer(void)
 {
 	return(L2radioObj->flush_rx());
 }
+/******************************************************************************/
 
+/**
+ * @Description Construct heartbeat message which is to be sent periodically
+ * @Returns the total bytes written in TX buffers
+ **/
+uint8_t ConstructL2Msg_HeartbeatStatus(void)
+{
+    uint8_t returnSize = 0;
+    S_TIMESTAMP currentTimeStamp = {
+        .YY = 63,
+        .MO = 12,
+        .DD = 31,
+        .HH = 23,
+        .MM = 59,
+        .SS = 59
+    };
+
+    returnSize = constructL2SendMessage(L2_MSG_HEARTBEAT,
+    		(reinterpret_cast <uint8_t *> (&currentTimeStamp)),
+            sizeof(S_TIMESTAMP));
+
+    return returnSize;
+}
+
+/*
+ * Construct L2 Send message
+ * Returns the total bytes written in TX buffers
+ */
+uint8_t constructL2SendMessage(L2_MESSAGE_ID msgId, uint8_t *data, uint8_t dataSize)
+{
+    uint8_t dataByteCntr = 0;
+    L2TXMsgBuffer[dataByteCntr] = msgId;
+    dataByteCntr++;
+    memcpy(&L2TXMsgBuffer[dataByteCntr], &TXAddress,
+            sizeof(TXAddress));
+    dataByteCntr += sizeof(TXAddress);
+    memcpy(&L2TXMsgBuffer[dataByteCntr], data, dataSize);
+    dataByteCntr += dataSize;
+
+    if(dataByteCntr > L2_TX_MSG_BUFFER_SIZE)
+    {
+    	dataByteCntr = L2_TX_MSG_BUFFER_SIZE;
+    }
+    return dataByteCntr;
+}
+
+/******************************************************************************/
 /*
 int RX_Task() {
 	RF24 radio(PIN_CE, PIN_CSN); // create a radio object
