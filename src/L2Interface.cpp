@@ -1,12 +1,18 @@
 #include <iostream>
 //#include <RF24/nRF24L01.h>
+
 #include <RF24/RF24.h> // SPI and work with GPIO (BCM numbering) are already implemented in the library
 #include "L2Interface.h"
+#include "L2Msg.h"
 
 using namespace std;
 
 #define PIN_CE 	17 // (chip enable)
 #define PIN_CSN 0  // (chip select not)
+
+
+extern uint8_t L2TXMsgBuffer[L2_TX_MSG_BUFFER_SIZE];
+extern uint8_t L2RXMsgBuffer[L2_RX_MSG_BUFFER_SIZE];
 
 uint8_t pipeNumber;
 uint8_t payloadSize;
@@ -24,6 +30,10 @@ L2Interface::L2Interface(RF24 *radioObj)
 	sRFInitData.TXretryDelay = 15; /*15 x 250us = 4000 us*/
 	sRFInitData.TXretryCount = 15; /*retry for 15 times*/
 	sRFInitData.TXaddress = 0x7878787878LL;
+}
+L2Interface::~L2Interface()
+{
+
 }
 
 void L2Interface::L2_Initialise(void)
@@ -104,6 +114,7 @@ uint8_t L2Interface::L2_flushRXBuffer(void)
 	return(L2radioObj->flush_rx());
 }
 
+/*
 int RX_Task() {
 	RF24 radio(PIN_CE, PIN_CSN); // create a radio object
 
@@ -150,7 +161,7 @@ int RX_Task() {
   }
   return 0;
 }
-
+*/
 int TX_Task() {
 
   RF24 radio(PIN_CE, PIN_CSN); // create a radio object
@@ -184,7 +195,7 @@ int TX_Task() {
 
     // Pass the address of the variable and its size in bytes, the value of which will be used as payload
     // And check for a returned data receipt packet
-    if (L2Comm.L2_writeData(&text, sizeof(text)))
+    if (L2Comm.L2_writeData(&L2TXMsgBuffer, sizeof(L2TXMsgBuffer)))
     {
       cout << "Delivered " << (int) sizeof(text) << " byte" << endl;
     }
@@ -220,7 +231,7 @@ int TX_Task() {
 int main()
 {
 	TX_Task();
-	RX_Task();
+//	RX_Task();
 
 	return 0;
 }
