@@ -57,7 +57,7 @@ int main() {
       for (uint8_t i = 0; i < sizeof(ackData); i++) {
         FIFO += ackData[i];
       }
-      Serial.println(FIFO);
+      //Serial.println(FIFO);
 
       // If all three FIFO buffers are full then clear
       if (radio.rxFifoFull()) {
