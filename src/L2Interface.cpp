@@ -55,7 +55,7 @@ void L2_ReceiveMode(RF24 *radioObj)
 
 bool L2_DataAvailable(RF24 *radioObj, uint8_t* pipe_num)
 {
-	radioObj->available(pipe_num);
+	return(radioObj->available(pipe_num));
 }
 
 uint8_t L2_payLoadSize(RF24 *radioObj)
