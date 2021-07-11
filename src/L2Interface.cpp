@@ -155,6 +155,10 @@ int main() {
 
   RF24 radio(PIN_CE, PIN_CSN); // create a radio object
 
+  	L2_Initialise(&radio, &sRFInitData);
+
+  	// module configuration output
+  	L2_printRFDetails(&radio);
   // If the transmitter has not received a response from the receiver, then it will retry sending data.
   // Wait between each retry, in multiples of 250,
   // the maximum is 15.0 means 250 μs, (15 * 250) +250 = 4000 μs,
